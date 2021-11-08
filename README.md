@@ -1,4 +1,6 @@
 ## CSI-Activity-Recognition
+### Combination of different old and new models
+Title: [A Survey on Behaviour Recognition Using WiFi Channel State Information](http://ieeexplore.ieee.org/document/8067693/) paper & some code by Siamak Yousefi, Hirokazu Narui, Sankalp Dayal, [Stefano Ermon](http://cs.stanford.edu/~ermon), Shahrokh Valaee helped.
 ### Dataset
 We collect dataset using [Linux 802.11n CSI Tool](https://dhalperi.github.io/linux-80211n-csitool/).  
 
@@ -16,5 +18,9 @@ tar -xzvf Dataset.tar.gz
 - Numpy
 - Tensorflow 2.0+
 - sklearn
+- pandas
+- matplotlib
+
 ### Run the Models to Extract & Train 
-- python csi_extractor.py
+- Complete extraction and train -> python csi_extractor.py
+- Then for Tensorflow 1.0 code -> run merge.py & current_network.py

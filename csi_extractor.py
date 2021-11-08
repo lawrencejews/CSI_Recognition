@@ -132,8 +132,7 @@ def train_valid_split(numpy_tuple, train_portion=0.9, seed=379):
     index = np.random.permutation([i for i in range(x_train.shape[0])])
     x_train = x_train[index, ...]
     y_train = y_train[index, ...]
-    return x_train, y_train, x_valid, y_valid
-    
+    return x_train, y_train, x_valid, y_valid  
     
 
 def extract_csi(raw_folder, labels, save=False, win_len=1000, thrshd=0.6, step=200):
@@ -235,8 +234,7 @@ class CSIModelConfig:
             numpy_list.append(y[i])
         return tuple(numpy_list)
 
-
-    
+   
     def build_model(self, n_unit_lstm=200, n_unit_atten=400):
         """
         Returns the Tensorflow Model which uses AttenLayer
@@ -305,6 +303,8 @@ if __name__ == "__main__":
     from sklearn.metrics import confusion_matrix
     import itertools
     import matplotlib.pyplot as plt
+    from sklearn.preprocessing import LabelBinarizer
+    from sklearn.metrics import roc_curve, auc, roc_auc_score
 
     cm = confusion_matrix(np.argmax(y_valid, axis=1), np.argmax(y_pred, axis=1))
 
@@ -324,7 +324,7 @@ if __name__ == "__main__":
         plt.yticks(tick_marks, classes)
 
         if normalize:
-            cm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
+            cm = np.round(cm.astype('float') / cm.sum(axis=1)[:, np.newaxis], decimals=2)
             print("Normalized confusion matrix")
         else:
             print('Confusion matrix, without normalization')
@@ -344,4 +344,35 @@ if __name__ == "__main__":
     cm_plot_labels = ['bed', 'fall', 'pickup', 'run', 'sitdown', 'standup', 'walk']
     plot_confusion_matrix(cm=cm, classes=cm_plot_labels, title='Confusion Matrix_BiLSTM')
     plt.savefig('plot_confusion_matrix.eps', dpi=300, format='eps')
+    plt.show()
+
+    target =  ['bed', 'fall', 'pickup', 'run', 'sitdown', 'standup', 'walk']
+
+    from sklearn.metrics import classification_report
+    print('\nClassification Report\n')
+    print(classification_report(y_valid, y_pred))
+
+    # set plot figure size
+    fig, c_ax = plt.subplots(1,1, figsize = (12, 8))
+
+    # function for scoring roc auc score for multi-class
+    def multiclass_roc_auc_score(y_valid, y_pred, average="macro"):
+        lb = LabelBinarizer()
+        lb.fit(y_valid)
+        y_valid = lb.transform(y_valid)
+        y_pred = lb.transform(y_pred)
+
+        for (idx, c_label) in enumerate(target):
+            fpr, tpr, thresholds = roc_curve(y_valid[:,idx].astype(int), y_pred[:,idx])
+            c_ax.plot(fpr, tpr, label = '%s (AUC:%0.2f)'  % (c_label, auc(fpr, tpr)))
+        c_ax.plot(fpr, fpr, 'b-', label = 'Random Guessing')
+
+        return roc_auc_score(y_valid, y_pred, average=average)
+
+    print('ROC AUC score:', multiclass_roc_auc_score(y_train, y_pred))
+
+    c_ax.legend()
+    c_ax.set_xlabel('False Positive Rate')
+    c_ax.set_ylabel('True Positive Rate')
+    plt.savefig('AUC_score.eps', dpi=300, format='eps')
     plt.show()
