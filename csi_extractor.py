@@ -2,11 +2,18 @@
 The Codes in this file are used to classify Human Activity using Channel State Information. 
 The deep learning architecture used here is Bidirectional LSTM stacked with One Attention Layer.
 """
-import numpy as np 
+import matplotlib.pyplot as plt
+import numpy as np
+from pandas.core.series import Series
+from sklearn import metrics 
 import tensorflow as tf
+import matplotlib as mpl
 import glob
 import os
 import csv
+
+mpl.rcParams['figure.figsize'] = (12, 10)
+colors = plt.rcParams['axes.prop_cycle'].by_key()['color']
 
 print("Num GPUs Available: ", len(tf.config.list_physical_devices('GPU')));
 
@@ -233,9 +240,8 @@ class CSIModelConfig:
             numpy_list.append(x[i])
             numpy_list.append(y[i])
         return tuple(numpy_list)
-
    
-    def build_model(self, n_unit_lstm=200, n_unit_atten=400):
+    def build_model(self, n_unit_lstm=200, n_unit_atten=400,):
         """
         Returns the Tensorflow Model which uses AttenLayer
         """
@@ -248,7 +254,7 @@ class CSIModelConfig:
         x_tensor = AttenLayer(n_unit_atten)(x_tensor)
         pred = tf.keras.layers.Dense(len(self._labels), activation='softmax')(x_tensor)
         model = tf.keras.Model(inputs=x_in, outputs=pred)
-        return model
+        return model     
     
     
     @staticmethod
@@ -260,7 +266,7 @@ class CSIModelConfig:
         """
         model = tf.keras.models.load_model(hdf5path, custom_objects={'AttenLayer':AttenLayer})
         return model
-    
+        
 
 if __name__ == "__main__":
     import sys
@@ -285,10 +291,10 @@ if __name__ == "__main__":
         loss='categorical_crossentropy', 
         metrics=['accuracy'])
     model.summary()
-    model.fit(
+    history = model.fit(
         x_train,
         y_train,
-        batch_size=128, epochs=2,
+        batch_size=128, epochs=1,
         validation_data=(x_valid, y_valid),
         callbacks=[
             tf.keras.callbacks.ModelCheckpoint('best_atten.hdf5',
@@ -300,29 +306,25 @@ if __name__ == "__main__":
     model = cfg.load_model('best_atten.hdf5')
     y_pred = model.predict(x_valid)
 
+    from plot_keras_history import plot_history
+    plot_history(history, path="singleton", single_graphs=True)
+    plt.show()
+
+
     from sklearn.metrics import confusion_matrix
     from sklearn.metrics import ConfusionMatrixDisplay
-    from sklearn.preprocessing import LabelBinarizer
     import matplotlib.pyplot as plt
-    from sklearn.metrics import roc_curve, auc
+    from sklearn.metrics import roc_curve, auc, roc_auc_score
+   
 
-    cm = confusion_matrix(np.argmax(y_valid, axis=1), np.argmax(y_pred, axis=1))
+    cm_plot_labels = ['bed', 'fall', 'pickup', 'run', 'sitdown', 'standup', 'walk']
+    cm = confusion_matrix(np.argmax(y_valid, axis=1), np.argmax(y_pred, axis=1),normalize='true')
 
-    cm_display = ConfusionMatrixDisplay(cm).plot(cmap="Blues", values_format='.2%' ) 
+    cm_display = ConfusionMatrixDisplay(cm, cm_plot_labels).plot(cmap="Blues") 
     plt.savefig('BiLSTM.eps', dpi=300, format='eps')
     plt.show()
 
-    fpr, tpr, _ = roc_curve(y_valid, y_pred)
-    roc_auc = auc(fpr, tpr)
+    
+   
 
-    plt.figure(figsize = (12, 8))
-    plt.plot(fpr, tpr, color='darkorange', lw=1, label='ROC curve (area = %0.2f)' % roc_auc )
-    plt.plot([0, 1], [0, 1], color='navy', lw=1, linestyle='--')
-    plt.xlim([0.0, 1.0])
-    plt.ylim([0.0, 1.05])
-    plt.xlabel('False Positive Rate')
-    plt.ylabel('True Positive Rate')
-    plt.title('Receiver operating characteristic')
-    plt.legend(loc="lower right")
-    plt.savefig('AUC_score.eps', dpi=300, format='eps')
-    plt.show()
+

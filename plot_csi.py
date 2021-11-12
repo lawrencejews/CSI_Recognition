@@ -67,7 +67,7 @@ else:
 
     print('ROC AUC score:', multiclass_roc_auc_score(y_train, y_pred))
 
-    plt.plot(multiclass_roc_auc_score(y_train, y_pred))
+    # plt.plot(multiclass_roc_auc_score(y_train, y_pred))
     c_ax.legend()
     c_ax.set_xlabel('False Positive Rate')
     c_ax.set_ylabel('True Positive Rate')
