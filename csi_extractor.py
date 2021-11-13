@@ -294,7 +294,7 @@ if __name__ == "__main__":
     history = model.fit(
         x_train,
         y_train,
-        batch_size=128, epochs=1,
+        batch_size=128, epochs=60,
         validation_data=(x_valid, y_valid),
         callbacks=[
             tf.keras.callbacks.ModelCheckpoint('best_atten.hdf5',
@@ -307,7 +307,7 @@ if __name__ == "__main__":
     y_pred = model.predict(x_valid)
 
     from plot_keras_history import plot_history
-    plot_history(history, path="singleton", single_graphs=True)
+    plot_history(history)
     plt.show()
 
 
