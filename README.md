@@ -1,4 +1,8 @@
 ## CSI-Activity-Recognition
+### Using old Tensorflow code to extract data
+- NOTE: Run the code from the ROOT not in Models.
+- Extract inputfiles and labels -> merge.py
+- Run to train CSI extracted data -> current_network.py
 ### Dataset
 We collect dataset using [Linux 802.11n CSI Tool](https://dhalperi.github.io/linux-80211n-csitool/).  
 
@@ -14,7 +18,7 @@ tar -xzvf Dataset.tar.gz
 ```
 ### Requirements
 - Numpy
-- Tensorflow 2.0+
+- Tensorflow 2.1+
 - sklearn
 - pandas
 - matplotlib
