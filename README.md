@@ -1,8 +1,4 @@
 ## CSI-Activity-Recognition
-### Using old Tensorflow code to extract data
-- NOTE: Run the code from the ROOT not in Models.
-- Extract inputfiles and labels -> merge.py
-- Run to train CSI extracted data -> current_network.py
 ### Dataset
 We collect dataset using [Linux 802.11n CSI Tool](https://dhalperi.github.io/linux-80211n-csitool/).  
 
@@ -16,13 +12,16 @@ The files with "input_" prefix are WiFi Channel State Information data.
 ```bash
 tar -xzvf Dataset.tar.gz
 ```
+### Using old Tensorflow code to extract data
+- NOTE: Run the code from the ROOT not in Models.
+- Extract inputfiles and labels -> merge.py
+- Run to train CSI extracted data -> current_network.py
+### Run the Models to Extract & Train from Root
+- Bidirectional model -> csi_extractor.py
+- Gru model -> gru.py
 ### Requirements
 - Numpy
 - Tensorflow 2.1+
 - sklearn
 - pandas
 - matplotlib
-
-### Run the Models to Extract & Train 
-- Complete extraction and train -> python csi_extractor.py
-- Then for Tensorflow 1.0 code -> run merge.py & current_network.py

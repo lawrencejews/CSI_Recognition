@@ -297,31 +297,28 @@ if __name__ == "__main__":
         batch_size=128, epochs=60,
         validation_data=(x_valid, y_valid),
         callbacks=[
-            tf.keras.callbacks.ModelCheckpoint('best_atten.hdf5',
+            tf.keras.callbacks.ModelCheckpoint('best_bidirectional.hdf5',
                                                 monitor='val_accuracy',
                                                 save_best_only=True,
                                                 save_weights_only=False)
             ])
     # load the best model
-    model = cfg.load_model('best_atten.hdf5')
+    model = cfg.load_model('best_bidirectional.hdf5')
     y_pred = model.predict(x_valid)
 
+    #Plotting Accuracy and Loss
     from plot_keras_history import plot_history
     plot_history(history)
     plt.show()
 
-
+    #Confusion matrix & plot
     from sklearn.metrics import confusion_matrix
     from sklearn.metrics import ConfusionMatrixDisplay
     import matplotlib.pyplot as plt
-    from sklearn.metrics import roc_curve, auc, roc_auc_score
    
-
     cm_plot_labels = ['bed', 'fall', 'pickup', 'run', 'sitdown', 'standup', 'walk']
-    cm = confusion_matrix(np.argmax(y_valid, axis=1), np.argmax(y_pred, axis=1),normalize='true')
-
-    cm_display = ConfusionMatrixDisplay(cm, cm_plot_labels).plot(cmap="Blues") 
-    plt.savefig('BiLSTM.eps', dpi=300, format='eps')
+    cm = confusion_matrix(np.argmax(y_valid, axis=1),np.argmax(y_pred, axis=1), normalize='true') 
+    cm_display = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=cm_plot_labels).plot(cmap="Blues") 
     plt.show()
 
     

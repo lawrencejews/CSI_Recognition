@@ -327,7 +327,7 @@ if __name__ == "__main__":
     history = model.fit(
         x_train,
         y_train,
-        batch_size=128, epochs=2,
+        batch_size=128, epochs=60,
         validation_data=(x_valid, y_valid),
         callbacks=[
             keras.callbacks.ModelCheckpoint('best_atten.hdf5',
@@ -339,25 +339,17 @@ if __name__ == "__main__":
     model = cfg.load_model('best_atten.hdf5')
     y_pred = model.predict(x_valid)
 
-    import sklearn
-    from sklearn.metrics import confusion_matrix
-    from plot_curves import plot_metrics, plot_roc, plot_cm, plot_prc
-
-    plot_metrics(history)
-    baseline_model = model.evaluate(x_train, y_train,
-                                    batch_size=128, verbose=0)
-    for name, value in zip(model.metrics_names, baseline_model):
-        print(name, ': ', value)
-    print()
-
-    baseline_model_1 = model.evaluate(x_valid, y_valid,
-                                      batch_size=128, verbose=0)
-    for name, value in zip(model.metrics_names, baseline_model_1):
-        print(name, ': ', value)
-    print()
-
-    plot_cm(np.argmax(y_valid, axis=1), np.argmax(y_pred, axis=1))
+    #Plotting Accuracy and Loss
+    from plot_keras_history import plot_history
+    plot_history(history)
     plt.show()
 
-
-    
+    #Confusion matrix & plot
+    from sklearn.metrics import confusion_matrix
+    from sklearn.metrics import ConfusionMatrixDisplay
+    import matplotlib.pyplot as plt
+   
+    cm_plot_labels = ['bed', 'fall', 'pickup', 'run', 'sitdown', 'standup', 'walk']
+    cm = confusion_matrix(np.argmax(y_valid, axis=1),np.argmax(y_pred, axis=1), normalize='true') 
+    cm_display = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=cm_plot_labels).plot(cmap="Blues") 
+    plt.show()
