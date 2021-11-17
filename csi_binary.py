@@ -330,18 +330,18 @@ if __name__ == "__main__":
         batch_size=128, epochs=60,
         validation_data=(x_valid, y_valid),
         callbacks=[
-            keras.callbacks.ModelCheckpoint('best_atten.hdf5',
+            keras.callbacks.ModelCheckpoint('best_binary.hdf5',
                                                monitor='val_accuracy',
                                                save_best_only=True,
                                                save_weights_only=False)
         ])
     # load the best model
-    model = cfg.load_model('best_atten.hdf5')
+    model = cfg.load_model('best_binary.hdf5')
     y_pred = model.predict(x_valid)
 
     #Plotting Accuracy and Loss
     from plot_keras_history import plot_history
-    plot_history(history)
+    plot_history(history, path="./graphs", single_graphs=True)
     plt.show()
 
     #Confusion matrix & plot
